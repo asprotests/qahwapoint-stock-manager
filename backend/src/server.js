@@ -38,8 +38,18 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
 // TEMPORARY: Secure seed endpoint - Admin user with ENV password
+// TEMPORARY: Secure seed endpoint - Admin user with ENV password
 app.get("/api/seed-database", async (req, res) => {
   try {
+    // Check if MongoDB is connected
+    const mongoose = (await import("mongoose")).default;
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not connected yet. Please wait and try again.",
+      });
+    }
+
     // Import User model
     const User = (await import("./models/User.js")).default;
 
@@ -66,7 +76,7 @@ app.get("/api/seed-database", async (req, res) => {
     // Create admin user
     const admin = await User.create({
       username: "admin",
-      password: adminPassword, // This will be hashed by the User model pre-save hook
+      password: adminPassword,
       role: "admin",
     });
 
