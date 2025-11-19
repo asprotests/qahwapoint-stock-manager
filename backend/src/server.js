@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "./config/database.js";
 import mongoose from "mongoose";
+import connectDB from "./config/database.js";
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -18,8 +18,24 @@ dotenv.config();
 const app = express();
 
 // CORS configuration for production
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log("❌ CORS blocked origin:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 
@@ -35,74 +51,73 @@ app.use("/api/stock", stockRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
-// // TEMPORARY: Protected seed endpoint
-// app.get("/api/seed-database", async (req, res) => {
-//   try {
-//     // Check if MongoDB is connected
-//     const mongoose = (await import("mongoose")).default;
-//     if (mongoose.connection.readyState !== 1) {
-//       return res.status(503).json({
-//         success: false,
-//         message: "Database not connected yet. Please wait and try again.",
-//         connectionState: mongoose.connection.readyState,
-//         states: {
-//           0: "disconnected",
-//           1: "connected",
-//           2: "connecting",
-//           3: "disconnecting",
-//         },
-//       });
-//     }
+// TEMPORARY: Protected seed endpoint
+app.get("/api/seed-database", async (req, res) => {
+  try {
+    // Check if MongoDB is connected
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not connected yet. Please wait and try again.",
+        connectionState: mongoose.connection.readyState,
+        states: {
+          0: "disconnected",
+          1: "connected",
+          2: "connecting",
+          3: "disconnecting",
+        },
+      });
+    }
 
-//     // Import User model
-//     const User = (await import("./models/User.js")).default;
+    // Import User model
+    const User = (await import("./models/User.js")).default;
 
-//     // Check if admin already exists
-//     const existingAdmin = await User.findOne({ username: "admin" });
+    // Check if admin already exists
+    const existingAdmin = await User.findOne({ username: "admin" });
 
-//     if (existingAdmin) {
-//       return res.json({
-//         success: true,
-//         message: "Admin user already exists",
-//       });
-//     }
+    if (existingAdmin) {
+      return res.json({
+        success: true,
+        message: "Admin user already exists",
+      });
+    }
 
-//     // Get password from environment variable
-//     const adminPassword = process.env.ADMIN_PASSWORD;
+    // Get password from environment variable
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
-//     if (!adminPassword) {
-//       return res.status(500).json({
-//         success: false,
-//         message: "ADMIN_PASSWORD environment variable not set",
-//       });
-//     }
+    if (!adminPassword) {
+      return res.status(500).json({
+        success: false,
+        message: "ADMIN_PASSWORD environment variable not set",
+      });
+    }
 
-//     // Create admin user
-//     await User.create({
-//       username: "admin",
-//       password: adminPassword,
-//       role: "admin",
-//     });
+    // Create admin user
+    await User.create({
+      username: "admin",
+      password: adminPassword,
+      role: "admin",
+    });
 
-//     console.log("✅ Admin user created");
+    console.log("✅ Admin user created");
 
-//     res.json({
-//       success: true,
-//       message: "Admin user created successfully! 🎉",
-//       admin: {
-//         username: "admin",
-//         note: "Password set from ADMIN_PASSWORD environment variable",
-//       },
-//     });
-//   } catch (error) {
-//     console.error("❌ Error creating admin:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Error creating admin user",
-//       error: error.message,
-//     });
-//   }
-// });
+    res.json({
+      success: true,
+      message: "Admin user created successfully! 🎉",
+      admin: {
+        username: "admin",
+        note: "Password set from ADMIN_PASSWORD environment variable",
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error creating admin:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating admin user",
+      error: error.message,
+    });
+  }
+});
 
 // Health check
 app.get("/", (req, res) => {
