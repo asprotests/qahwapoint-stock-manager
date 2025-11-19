@@ -37,11 +37,6 @@ app.use("/api/stock", stockRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
-// Health check
-app.get("/", (req, res) => {
-  res.json({ message: "QahwaPoint API is running" });
-});
-
 // TEMPORARY: Secure seed endpoint - Admin user with ENV password
 app.get("/api/seed-database", async (req, res) => {
   try {
@@ -93,6 +88,11 @@ app.get("/api/seed-database", async (req, res) => {
       error: error.message,
     });
   }
+});
+
+// Health check
+app.get("/", (req, res) => {
+  res.json({ message: "QahwaPoint API is running" });
 });
 
 // Error handler
