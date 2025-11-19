@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/database.js";
+import mongoose from "mongoose";
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -108,9 +109,7 @@ app.get("/", (req, res) => {
   res.json({
     message: "QahwaPoint API is running",
     dbStatus:
-      require("mongoose").connection.readyState === 1
-        ? "connected"
-        : "disconnected",
+      mongoose.connection.readyState === 1 ? "connected" : "disconnected",
   });
 });
 
