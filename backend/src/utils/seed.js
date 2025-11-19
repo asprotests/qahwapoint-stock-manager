@@ -23,7 +23,7 @@ const seedData = async () => {
     // Create admin user
     const admin = await User.create({
       username: "admin",
-      password: "admin123",
+      password: "QahwaPoint@2025",
       role: "admin",
     });
 
