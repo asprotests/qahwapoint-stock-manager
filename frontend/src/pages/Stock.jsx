@@ -143,7 +143,7 @@ const Stock = () => {
   };
 
   const calculateCostPerUnit = (stock) => {
-    return (stock.cost / stock.costPer).toFixed(2);
+    return (stock.cost / stock.costPer).toFixed(3);
   };
 
   if (isLoading) {
@@ -226,10 +226,10 @@ const Stock = () => {
                     <td>
                       <div className="text-sm">
                         <div className="font-medium">
-                          ${stock.cost} / {stock.costPer} {stock.unit}
+                          KES {stock.cost} / {stock.costPer} {stock.unit}
                         </div>
                         <div className="text-gray-500">
-                          ${calculateCostPerUnit(stock)} per {stock.unit}
+                          KES {calculateCostPerUnit(stock)} per {stock.unit}
                         </div>
                       </div>
                     </td>
@@ -328,7 +328,7 @@ const Stock = () => {
               }
               className="input"
               min="0"
-              step="0.01"
+              step="0.001"
               required
             />
           </div>
@@ -341,7 +341,7 @@ const Stock = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cost ($)
+                  Cost (KES)
                 </label>
                 <input
                   type="number"
@@ -351,8 +351,8 @@ const Stock = () => {
                   }
                   className="input"
                   min="0"
-                  step="0.01"
-                  placeholder="e.g., 25"
+                  step="0.001"
+                  placeholder="e.g., 25.084"
                   required
                 />
               </div>
@@ -367,8 +367,8 @@ const Stock = () => {
                     setFormData({ ...formData, costPer: e.target.value })
                   }
                   className="input"
-                  min="0.01"
-                  step="0.01"
+                  min="0.001"
+                  step="0.001"
                   placeholder="e.g., 1"
                   required
                 />
@@ -376,8 +376,8 @@ const Stock = () => {
             </div>
             {formData.cost > 0 && formData.costPer > 0 && (
               <div className="mt-2 text-sm text-gray-600 bg-blue-50 p-2 rounded">
-                <strong>Cost per {formData.unit || "unit"}:</strong> $
-                {(formData.cost / formData.costPer).toFixed(2)}
+                <strong>Cost per {formData.unit || "unit"}:</strong> KES{" "}
+                {(formData.cost / formData.costPer).toFixed(3)}
               </div>
             )}
           </div>

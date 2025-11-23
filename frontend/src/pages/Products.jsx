@@ -71,15 +71,13 @@ const Products = () => {
     let totalCost = 0;
     product.ingredients.forEach((ing) => {
       if (ing.stockItem && ing.stockItem.cost && ing.stockItem.costPer) {
-        // Calculate cost per unit of the stock item
         const costPerUnit = ing.stockItem.cost / ing.stockItem.costPer;
-        // Multiply by quantity required
         const ingredientCost = costPerUnit * ing.quantityRequired;
         totalCost += ingredientCost;
       }
     });
 
-    return totalCost.toFixed(2);
+    return totalCost.toFixed(3);
   };
 
   const openModal = (product = null) => {
@@ -217,7 +215,7 @@ const Products = () => {
                     <td>{product.ingredients.length}</td>
                     <td>
                       <span className="font-medium text-green-600">
-                        ${calculateProductCost(product)}
+                        KES {calculateProductCost(product)}
                       </span>
                     </td>
                     <td className="text-right">
@@ -350,7 +348,7 @@ const Products = () => {
                         className="input"
                         placeholder="Quantity"
                         min="0"
-                        step="0.01"
+                        step="0.001"
                         required
                       />
                     </div>
@@ -418,12 +416,12 @@ const Products = () => {
                     {ingredient.stockItem?.cost &&
                       ingredient.stockItem?.costPer && (
                         <div className="text-xs text-gray-500 mt-1">
-                          Cost: $
+                          Cost: KES{" "}
                           {(
                             (ingredient.stockItem.cost /
                               ingredient.stockItem.costPer) *
                             ingredient.quantityRequired
-                          ).toFixed(2)}
+                          ).toFixed(3)}
                         </div>
                       )}
                   </div>
@@ -433,7 +431,7 @@ const Products = () => {
                     Total Cost
                   </div>
                   <div className="text-xl font-bold text-green-600 mt-1">
-                    ${calculateProductCost(selectedProduct)}
+                    KES {calculateProductCost(selectedProduct)}
                   </div>
                 </div>
               </>
